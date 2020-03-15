@@ -12,7 +12,7 @@ import java.util.ArrayList;
 
 public class MyBST<T extends Comparable<T>>{
     private Node root;
-    private int size;   
+    private int size;
 
     public MyBST(){
         this.root = null;
@@ -378,6 +378,24 @@ public class MyBST<T extends Comparable<T>>{
 
         return list;
     } // end method breadthFirstTraversal
+
+    /**
+    *   Calculates the width of this tree,
+    *   i.e. the number of nodes in the
+    *   level with the most nodes.
+    */
+    public int width(){
+        // TODO: implement
+        return -1;
+    } // end method width
+
+    /**
+    *   @return the width of the tree at depth d
+    */
+    protected int widthAtDepth(int d){
+        // TODO: implement
+        return -1;
+    } // end method widthAtDepth
 
     /**
     *   This inner class provides Nodes
