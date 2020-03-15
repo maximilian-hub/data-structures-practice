@@ -12,7 +12,7 @@ import java.util.LinkedList;
 *
 *   @author         Max Spedale
     Created:        March 3, 2020
-*   Last updated:   March 7, 2020
+*   Last updated:   March 15, 2020
 */
 public class MyQueue<T>{
     private LinkedList<T> list;
@@ -62,4 +62,11 @@ public class MyQueue<T>{
         return this.list.isEmpty();
     } // end method isEmpty
 
+    /**
+    *   @return the number of elements in
+    *   this queue
+    */
+    public int size(){
+        return this.list.size();
+    } // end method size
 } // end class
