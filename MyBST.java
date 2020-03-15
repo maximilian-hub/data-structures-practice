@@ -7,7 +7,7 @@ import java.util.ArrayList;
 *
 *   @author         Maximilian Spedale
 *   Created:        March 6, 2020
-*   Last updated:   March 8, 2020
+*   Last updated:   March 15, 2020
 */
 
 public class MyBST<T extends Comparable<T>>{
@@ -133,6 +133,29 @@ public class MyBST<T extends Comparable<T>>{
         else
             return currentNode;
     } // end method recursiveMax
+
+    /**
+    *   Recursively calculates the height
+    *   of this tree.
+    *   Leaves have a height of 0.
+    *   Nonexistent nodes have a height of -1.
+    */
+    private int recursiveHeight(Node n){
+        if (n == null)
+            return -1;
+        if (n.isLeaf())
+            return 0;
+        else
+            return Math.max(recursiveHeight(n.leftChild), recursiveHeight(n.rightChild));
+    } // end method recursiveHeight
+
+    /**
+    *   @return the total number of levels
+    *           in this tree
+    */
+    private int levels(){
+        return recursiveHeight(this.root) + 1;
+    } // end method levels
 
     /**
     *   Inserts new data in this tree,
@@ -385,17 +408,41 @@ public class MyBST<T extends Comparable<T>>{
     *   level with the most nodes.
     */
     public int width(){
-        // TODO: implement
-        return -1;
+        if (this.isEmpty()) return 0;
+        int width = 0;
+        MyQueue<Node> q = new MyQueue();
+
+        q.enqueue(this.root);  // load queue with the nodes of the first level, ie the root.
+        int currentWidth = 1;  // width of the first level is 1.
+
+        while(!q.isEmpty()){
+            loadQueueWithNextLevel(q);              // replace the nodes in the current level, with those in the next level.
+            currentWidth = q.size();                // count the nodes in the new level.
+            width = Math.max(width, currentWidth);  // if the new level has more nodes than the previous leve, update the width.
+        }
+
+        return width;
     } // end method width
 
     /**
-    *   @return the width of the tree at depth d
+    *   Given a queue containing every node in
+    *   one level of a tree, replace those nodes
+    *   with their children.
+    *
+    *   @param q a list containing every node at some level of this tree
     */
-    protected int widthAtDepth(int d){
-        // TODO: implement
-        return -1;
-    } // end method widthAtDepth
+    private void loadQueueWithNextLevel(MyQueue<Node> q){
+        int count = q.size();
+
+        while (count-- != 0){
+            Node temp = q.dequeue();
+
+            if (temp.hasLeftChild())
+                q.enqueue(temp.leftChild);
+            if (temp.hasRightChild())
+                q.enqueue(temp.rightChild);
+        }
+    } // end method loadQueueWithNextLevel
 
     /**
     *   This inner class provides Nodes
