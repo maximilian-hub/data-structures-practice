@@ -7,7 +7,7 @@ import java.util.ArrayList;
 *
 *   @author         Maximilian Spedale
 *   Created:        March 6, 2020
-*   Last updated:   March 15, 2020
+*   Last updated:   March 16, 2020
 */
 
 public class MyBST<T extends Comparable<T>>{
@@ -37,49 +37,53 @@ public class MyBST<T extends Comparable<T>>{
 
     /**
     *   Tests if this tree contains some value.
-    *   @param t the value to be searched for
+    *   @param value the value to be searched for
     *   @return 'true' if the value exists in this tree
     */
-    public boolean contains(T t){
-        return recursiveSearch(this.root, t);
+    public boolean contains(T value){
+        return recursiveSearch(this.root, value);
     } // end method contains
 
     /**
     *   Recursively searches for some value.
-    *   @param t the value to be searched for
+    *
+    *   @param currentNode the root of the subtree to be searched
+    *   @param value the value to be searched for
     *   @return 'true' if this subtree contains t
     */
-    private boolean recursiveSearch(Node currentNode, T t){
-        if (currentNode.data.equals(t)){  // base case
+    private boolean recursiveSearch(Node currentNode, T value){
+        if (currentNode.data.equals(value))         // base case: it's here!
             return true;
-        // if t is lower than the current node's value, search left:
-        } else if (t.compareTo(currentNode.data) < 0){
-            return searchLeft(currentNode, t);
-        }
-        // if t is higher than the current node's value, search right:
-        else {
-            return searchRight(currentNode, t);
-        }
+        else if (t.compareTo(currentNode.data) < 0) // if the current node's value is too high,
+            return searchLeft(currentNode, value);  // search left.
+        else                                        // if the current node's value is too low,
+            return searchRight(currentNode, value); // search right.
     } // end method recursiveSearch
 
     /**
     *   Searches a node's left subtree for some value.
+    *
+    *   @param currentNode the node whose right subtree is to be searched
+    *   @param value the value to be searched for
     *   @return 'true' is the value is found
     */
-    private boolean searchLeft(Node currentNode, T t){
+    private boolean searchLeft(Node currentNode, T value){
         if (currentNode.hasLeftChild())
-            return recursiveSearch(currentNode.leftChild, t);
+            return recursiveSearch(currentNode.leftChild, value);
         else
             return false;
     } // end method searchLeft
 
     /**
     *   Searches a node's right subtree for some value.
+    *
+    *   @param currentNode the node whose right subtree is to be searched
+    *   @param value the value to be searched for
     *   @return 'true' is the value is found
     */
-    private boolean searchRight(Node currentNode, T t){
+    private boolean searchRight(Node currentNode, T value){
         if (currentNode.hasRightChild()){
-            return recursiveSearch(currentNode.rightChild, t);
+            return recursiveSearch(currentNode.rightChild, value);
         } else {
             return false;
         }
@@ -173,7 +177,9 @@ public class MyBST<T extends Comparable<T>>{
 
     /**
     *   A recursive method that inserts
-    *   a new value into this subtree.
+    *   a new value into a subtree.
+    *   @param currentNode the root of the subtree into which you're inserting
+    *   @param data the value you're inserting
     */
     private void recursiveAdd(Node currentNode, T data){
         if (data.compareTo(currentNode.getData()) < 0) {        // if the incoming data is lower than the current node's,
@@ -229,13 +235,12 @@ public class MyBST<T extends Comparable<T>>{
     *   @param data the value to be removed
     */
     private void recursiveRemove(Node currentNode, T data){
-        if (currentNode.data.equals(data)){
+        if (currentNode.data.equals(data))                  // base case: it's here!
             delete(currentNode);
-        }else if (data.compareTo(currentNode.data) < 0){
-            recursiveRemove(currentNode.leftChild, data);
-        }else{
-            recursiveRemove(currentNode.rightChild, data);
-        }
+        else if (data.compareTo(currentNode.data) < 0)      // if the current node's value is too high,
+            recursiveRemove(currentNode.leftChild, data);   // remove from the left subtree.
+        else                                                // if the current node's value is too low,
+            recursiveRemove(currentNode.rightChild, data);  // remove from the right subtree.
     } // end method recursiveRemove
 
     /**
@@ -244,16 +249,30 @@ public class MyBST<T extends Comparable<T>>{
     *   Handles the children appropriately.
     */
     private void delete(Node currentNode){
-        if (currentNode.isRoot()){
+        if (currentNode.isRoot())
             deleteRoot();
-        } else if (currentNode.isLeaf()){
+        else if (currentNode.isLeaf())
             deleteLeaf(currentNode);
-        } else if (currentNode.hasOneChild()){
+        else if (currentNode.hasOneChild())
             deleteNodeWithOneChild(currentNode);
-        } else { // if currentNode has two children:
+        else
             deleteNodeWithTwoChildren(currentNode);
-        }
     } // end method delete
+
+    /**
+    *   Deletes the root of this tree.
+    *   Assumes this tree actually has a root.
+    */
+    private void deleteRoot(){
+        if (root.isLeaf()){
+            root = null;
+        } else if (root.hasOneChild()){
+            root = root.onlyChild();
+        } else { // if root has two children:
+            deleteNodeWithTwoChildren(root);
+        }
+        this.size--;
+    } // end method deleteRoot
 
     /**
     *   Removes a childless node from
@@ -285,21 +304,6 @@ public class MyBST<T extends Comparable<T>>{
         n.data = temp.data;
         delete(temp);
     } // end method deleteNodeWithTwoChildren
-
-    /**
-    *   Deletes the root of this tree.
-    *   Assumes this tree actually has a root.
-    */
-    private void deleteRoot(){
-        if (root.isLeaf()){
-            root = null;
-        } else if (root.hasOneChild()){
-            root = root.onlyChild();
-        } else { // if root has two children:
-            deleteNodeWithTwoChildren(root);
-        }
-        this.size--;
-    } // end method deleteRoot
 
     /**
     *   Returns an iterable list containing every
@@ -409,11 +413,11 @@ public class MyBST<T extends Comparable<T>>{
     */
     public int width(){
         if (this.isEmpty()) return 0;
-        int width = 0;
         MyQueue<Node> q = new MyQueue();
 
         q.enqueue(this.root);  // load queue with the nodes of the first level, ie the root.
         int currentWidth = 1;  // width of the first level is 1.
+        int width = 1;
 
         while(!q.isEmpty()){
             loadQueueWithNextLevel(q);              // replace the nodes in the current level, with those in the next level.
@@ -544,8 +548,8 @@ public class MyBST<T extends Comparable<T>>{
         *   with a new one. Assumes that 'old'
         *   is an actual child of this node.
         *
-        *   @param old the child to be replaced
-        *   @param new the replacer
+        *   @param currentChild the child to be replaced
+        *   @param newChild the replacer
         */
         public void replaceChild(Node currentChild, Node newChild){
             if (this.leftChild == currentChild){
